@@ -2,7 +2,7 @@
 
 PhishTracer est une application web moderne permettant de détecter et tracer les tentatives de phishing à partir d'URL suspectes. Elle propose une interface utilisateur intuitive et un backend sécurisé avec intégration de l'API CheckPhish.
 
- 🚀 Fonctionnalités principales
+### 🚀 Fonctionnalités principales
 
 - **🔍 Analyse d'URL** : Détection de phishing via l'API CheckPhish
 - **👥 Gestion des utilisateurs** : Inscription, connexion, rôles (user/admin)
