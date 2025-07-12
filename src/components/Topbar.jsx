@@ -17,7 +17,7 @@ export default function Topbar() {
               alt="Avatar"
               className="h-8 w-8 rounded-full"
             />
-            <span className="text-sm font-medium text-gray-700">John Doe</span>
+            <span className="text-sm font-medium text-gray-700"></span>
           </button>
 
           {isMenuOpen && (

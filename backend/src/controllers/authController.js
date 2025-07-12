@@ -1,8 +1,6 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const config = require('../config/config');
-const admin = require('firebase-admin');
-const db = admin.firestore();
 
 // Create token
 const createToken = (id) => {
@@ -65,7 +63,8 @@ exports.register = async (req, res) => {
     console.error('Erreur lors de l\'inscription:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de l\'inscription'
+      message: 'Erreur lors de l\'inscription',
+      error: error.message
     });
   }
 };
@@ -90,7 +89,7 @@ exports.login = async (req, res) => {
 
     console.log('Utilisateur trouvé, vérification du mot de passe');
     // Check if password matches
-    const isMatch = await User.matchPassword(password, user.password);
+    const isMatch = await user.matchPassword(password);
     if (!isMatch) {
       console.log('Mot de passe incorrect');
       return res.status(401).json({
@@ -99,13 +98,17 @@ exports.login = async (req, res) => {
       });
     }
 
+    // Update last login
+    await user.update({ lastLogin: new Date() });
+
     console.log('Connexion réussie');
     sendTokenResponse(user, 200, res);
   } catch (error) {
     console.error('Erreur de connexion:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la connexion'
+      message: 'Erreur lors de la connexion',
+      error: error.message
     });
   }
 };
@@ -116,6 +119,13 @@ exports.login = async (req, res) => {
 exports.getMe = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Utilisateur non trouvé'
+      });
+    }
+    
     res.status(200).json({
       success: true,
       user: {
@@ -129,7 +139,8 @@ exports.getMe = async (req, res) => {
     console.error('GetMe error:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération du profil'
+      message: 'Erreur lors de la récupération du profil',
+      error: error.message
     });
   }
 };
@@ -155,10 +166,9 @@ exports.logout = async (req, res) => {
 exports.createFirstAdmin = async (req, res) => {
   try {
     // Check if any admin exists
-    const usersRef = db.collection('users');
-    const adminSnapshot = await usersRef.where('role', '==', 'admin').get();
-    
-    if (!adminSnapshot.empty) {
+    const adminCount = await User.count({ where: { role: 'admin' } });
+
+    if (adminCount > 0) {
       return res.status(400).json({
         success: false,
         message: 'Un administrateur existe déjà'
@@ -180,7 +190,8 @@ exports.createFirstAdmin = async (req, res) => {
     console.error('Erreur lors de la création de l\'admin:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la création de l\'administrateur'
+      message: 'Erreur lors de la création de l\'administrateur',
+      error: error.message
     });
   }
 }; 

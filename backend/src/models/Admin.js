@@ -1,49 +1,70 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const { sequelize } = require('../config/database');
 const bcrypt = require('bcryptjs');
 
-const adminSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, 'Veuillez fournir un email'],
-    unique: true,
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      'Veuillez fournir un email valide'
-    ]
-  },
-  password: {
-    type: String,
-    required: [true, 'Veuillez fournir un mot de passe'],
-    minlength: 6,
-    select: false
+const Admin = sequelize.define('Admin', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
   },
   name: {
-    type: String,
-    required: [true, 'Veuillez fournir un nom']
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      notEmpty: true
+    }
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+    validate: {
+      isEmail: true,
+      notEmpty: true
+    }
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    validate: {
+      len: [6, 100]
+    }
   },
   role: {
-    type: String,
-    enum: ['admin'],
-    default: 'admin'
+    type: DataTypes.ENUM('admin'),
+    defaultValue: 'admin'
   },
   createdAt: {
-    type: Date,
-    default: Date.now
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  }
+}, {
+  tableName: 'admins',
+  timestamps: true,
+  hooks: {
+    beforeCreate: async (admin) => {
+      if (admin.password) {
+        const salt = await bcrypt.genSalt(12);
+        admin.password = await bcrypt.hash(admin.password, salt);
+      }
+    },
+    beforeUpdate: async (admin) => {
+      if (admin.changed('password')) {
+        const salt = await bcrypt.genSalt(12);
+        admin.password = await bcrypt.hash(admin.password, salt);
+      }
+    }
   }
 });
 
-// Encrypt password using bcrypt
-adminSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) {
-    next();
-  }
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-});
-
-// Match user entered password to hashed password in database
-adminSchema.methods.matchPassword = async function(enteredPassword) {
+// Instance method to compare passwords
+Admin.prototype.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = mongoose.model('Admin', adminSchema); 
+module.exports = { Admin }; 

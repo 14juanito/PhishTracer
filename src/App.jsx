@@ -1,62 +1,91 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { SecurityProvider } from './contexts/SecurityContext';
 import Header from './components/Header';
-import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
-import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
 import AdminRegister from './pages/AdminRegister';
-import Notification from './components/Notification';
+import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import UrlScanner from './pages/UrlScanner';
+import EmailScanner from './pages/EmailScanner';
+import ScanHistory from './pages/ScanHistory';
+import Settings from './pages/Settings';
 import PrivateRoute from './components/PrivateRoute';
+import AdminRoute from './components/AdminRoute';
 
-function AppContent() {
-  const { notification, setNotification } = useAuth();
-
+// Composant pour conditionner l'affichage du header
+const AppContent = () => {
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin/login') || location.pathname.startsWith('/admin/register');
+  
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      {notification && (
-        <Notification
-          type={notification.type}
-          message={notification.message}
-          onClose={() => setNotification(null)}
-        />
-      )}
-      <div className="flex-grow">
+    <div className="App">
+      {!isAdminPage && <Header />}
+      <div className={!isAdminPage ? "pt-16" : ""}>
         <Routes>
+          {/* Routes publiques */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route 
-            path="/admin-dashboard" 
-            element={
-              <PrivateRoute requiredRole="admin">
-                <AdminDashboard />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/admin-login" element={<AdminLogin />} />
-          <Route path="/admin-register" element={<AdminRegister />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/register" element={<AdminRegister />} />
+          
+          {/* Routes protégées utilisateur */}
+          <Route path="/dashboard" element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/url-scanner" element={
+            <PrivateRoute>
+              <UrlScanner />
+            </PrivateRoute>
+          } />
+          <Route path="/email-scanner" element={
+            <PrivateRoute>
+              <EmailScanner />
+            </PrivateRoute>
+          } />
+          <Route path="/scan-history" element={
+            <PrivateRoute>
+              <ScanHistory />
+            </PrivateRoute>
+          } />
+          <Route path="/settings" element={
+            <PrivateRoute>
+              <Settings />
+            </PrivateRoute>
+          } />
+
+          {/* Routes protégées admin */}
+          <Route path="/admin/dashboard" element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          } />
+
+          {/* Redirection par défaut */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
-      <Footer />
     </div>
   );
-}
+};
 
-function App() {
+const App = () => {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <SecurityProvider>
+          <AppContent />
+        </SecurityProvider>
       </AuthProvider>
     </Router>
   );
-}
+};
 
 export default App; 

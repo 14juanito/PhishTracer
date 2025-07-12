@@ -13,7 +13,7 @@ const Footer = () => {
               <img
                 src="/assets/logo.png"
                 alt="PhishTracer Logo"
-                className="h-8 w-auto"
+                className="h-18 w-auto"
               />
             </Link>
             <p className="mt-4 text-sm text-gray-500">

@@ -6,7 +6,10 @@ const {
   getAllScans,
   deleteUser,
   deleteScan,
-  getStats
+  getStats,
+  createUser,
+  updateUser,
+  getApiStats
 } = require('../controllers/adminController');
 
 // Protect all routes
@@ -14,9 +17,11 @@ router.use(protect);
 router.use(authorize('admin'));
 
 router.route('/users')
-  .get(getUsers);
+  .get(getUsers)
+  .post(createUser);
 
 router.route('/users/:id')
+  .put(updateUser)
   .delete(deleteUser);
 
 router.route('/scans')
@@ -27,5 +32,8 @@ router.route('/scans/:id')
 
 router.route('/stats')
   .get(getStats);
+
+router.route('/api-stats')
+  .get(getApiStats);
 
 module.exports = router; 

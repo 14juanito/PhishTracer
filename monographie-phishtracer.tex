@@ -1,0 +1,88 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{PhishTracer : Détection et Traçage de Phishing}
+\author{[Votre Nom]}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+PhishTracer est une application web permettant de détecter et tracer les tentatives de phishing à partir d'URL ou d'e-mails suspects. Ce document présente l'architecture, les fonctionnalités et l'utilisation de la solution.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introduction}
+Le phishing est une menace majeure pour la sécurité des utilisateurs sur Internet. PhishTracer vise à fournir un outil simple et efficace pour analyser des liens ou des e-mails suspects et alerter l'utilisateur.
+
+\chapter{Architecture du projet}
+L'application est composée de deux parties principales :
+\begin{itemize}
+  \item \textbf{Frontend} : développé en React, il offre une interface utilisateur moderne et intuitive.
+  \item \textbf{Backend} : basé sur Node.js, Express et Firebase, il gère l'authentification, le stockage des données et la logique métier.
+\end{itemize}
+
+\section{Schéma global}
+\begin{itemize}
+  \item L'utilisateur interagit avec l'interface React.
+  \item Les requêtes sont envoyées au backend Express.
+  \item Les données sont stockées et sécurisées via Firebase (Firestore et Auth).
+\end{itemize}
+
+\chapter{Fonctionnalités principales}
+\begin{itemize}
+  \item Analyse d'URL et d'e-mails pour détecter le phishing
+  \item Tableau de bord utilisateur et administrateur
+  \item Authentification sécurisée (utilisateurs et admins)
+  \item Historique des scans
+  \item Notifications de sécurité
+\end{itemize}
+
+\chapter{Technologies utilisées}
+\begin{itemize}
+  \item \textbf{Frontend} : React, TailwindCSS, Axios, Framer Motion
+  \item \textbf{Backend} : Node.js, Express, Firebase (Firestore, Auth)
+  \item \textbf{Sécurité} : Helmet, Sanitize-html, JWT
+\end{itemize}
+
+\chapter{Installation}
+\section{Prérequis}
+\begin{itemize}
+  \item Node.js >= 16
+  \item npm
+\end{itemize}
+
+\section{Installation du frontend}
+\begin{verbatim}
+cd PhishTracer-1.0
+npm install
+npm run dev
+\end{verbatim}
+
+\section{Installation du backend}
+\begin{verbatim}
+cd backend
+npm install
+npm run dev
+\end{verbatim}
+
+\chapter{Utilisation}
+\begin{itemize}
+  \item Accédez à l'interface web sur http://localhost:5173
+  \item Inscrivez-vous ou connectez-vous
+  \item Utilisez le scanner d'URL ou d'e-mails
+  \item Consultez l'historique et les notifications
+\end{itemize}
+
+\chapter{Conclusion}
+PhishTracer propose une solution moderne et sécurisée pour lutter contre le phishing. Son architecture modulaire permet une évolution facile et une adaptation à de nouveaux besoins.
+
+\end{document} 

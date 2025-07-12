@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Configuration d'axios pour pointer vers le backend
+axios.defaults.baseURL = 'http://localhost:5000';
+
 const AuthContext = createContext();
 
 export function useAuth() {
@@ -26,7 +29,7 @@ export function AuthProvider({ children }) {
       console.log('Réponse de connexion:', response.data);
       setCurrentUser(response.data.user);
       showNotification('success', 'Connexion réussie !');
-      return response.data;
+      return response.data; // Retourne les données complètes incluant le rôle
     } catch (error) {
       console.error('Erreur de connexion:', error.response?.data || error);
       if (error.response?.data?.message === 'Email ou mot de passe incorrect') {
@@ -100,8 +103,9 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     getMe()
-      .catch(() => {
-        // If getMe fails, we assume the user is not logged in
+      .catch((error) => {
+        // Si getMe échoue, on assume que l'utilisateur n'est pas connecté
+        console.log('Utilisateur non connecté ou API non disponible:', error.message);
         setCurrentUser(null);
       })
       .finally(() => {
@@ -116,12 +120,13 @@ export function AuthProvider({ children }) {
     logout,
     getMe,
     notification,
-    setNotification
+    setNotification,
+    loading
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 } 
