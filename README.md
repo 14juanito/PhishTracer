@@ -4,7 +4,7 @@ PhishTracer est une application web moderne permettant de détecter et tracer le
 
 ### 🚀 Fonctionnalités principales
 
-- **🔍 Analyse d'URL** : Détection de phishing via l'API CheckPhish
+- **🔍 Analyse d'URL** : Détection de phishing via l'API Google Safe
 - **👥 Gestion des utilisateurs** : Inscription, connexion, rôles (user/admin)
 - **📊 Tableau de bord** : Interface utilisateur et administrateur
 - **📈 Historique des scans** : Suivi complet des analyses effectuées
@@ -30,7 +30,7 @@ PhishTracer est une application web moderne permettant de détecter et tracer le
 - **bcryptjs** - Hashage des mots de passe
 
 ### API Externe
-- **CheckPhish API** - Détection de phishing avancée
+- **Google  Safe** - Détection de phishing avancée
 
 ## 📋 Prérequis
 
