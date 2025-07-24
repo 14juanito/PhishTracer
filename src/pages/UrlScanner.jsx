@@ -176,16 +176,10 @@ const UrlScanner = () => {
           >
             <div className={`px-6 py-4 ${getVerdictBg(result.isPhishing)}`}>
               <div className="flex items-center">
-                <div className={`${getVerdictColor(result.isPhishing)}`}>
-                  {getVerdictIcon(result.isPhishing)}
-                </div>
+                <div className={`${getVerdictColor(result.isPhishing)}`}>{getVerdictIcon(result.isPhishing)}</div>
                 <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    Résultat de l'analyse
-                  </h3>
-                  <p className={`text-sm font-medium ${getVerdictColor(result.isPhishing)}`}>
-                    {result.isPhishing ? 'URL malveillante détectée' : 'URL sécurisée'}
-                  </p>
+                  <h3 className="text-lg font-semibold text-gray-900">Résultat de l'analyse</h3>
+                  <p className={`text-sm font-medium ${getVerdictColor(result.isPhishing)}`}>{result.isPhishing ? 'URL malveillante détectée' : 'URL non détectée comme phishing'}</p>
                 </div>
               </div>
             </div>
@@ -194,69 +188,62 @@ const UrlScanner = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* URL Details */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                    Détails de l'URL
-                  </h4>
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Détails de l'URL</h4>
                   <div className="space-y-3">
                     <div>
                       <label className="block text-xs font-medium text-gray-500">URL analysée</label>
                       <p className="text-sm text-gray-900 break-all">{result.url}</p>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500">Verdict</label>
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        result.isPhishing 
-                          ? 'bg-red-100 text-red-800' 
-                          : 'bg-green-100 text-green-800'
-                      }`}>
-                        {result.isPhishing ? 'Phishing détecté' : 'Sûr'}
-                      </span>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-gray-500">Confiance</label>
+                      <label className="block text-xs font-medium text-gray-500">Risque de phishing</label>
                       <div className="flex items-center">
                         <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
                           <div 
                             className={`h-2 rounded-full ${
-                              result.isPhishing ? 'bg-red-500' : 'bg-green-500'
+                              result.suspicionPercent >= 70 ? 'bg-red-500' : result.suspicionPercent >= 40 ? 'bg-yellow-500' : 'bg-green-500'
                             }`}
-                            style={{ width: `${result.confidence || 0}%` }}
+                            style={{ width: `${result.suspicionPercent || 0}%` }}
                           ></div>
                         </div>
-                        <span className="text-sm text-gray-600">{result.confidence || 0}%</span>
+                        <span className="text-sm text-gray-600">{result.suspicionPercent || 0}%</span>
                       </div>
+                      <div className="text-xs mt-1">
+                        {result.suspicionPercent >= 70 && "Risque élevé de phishing"}
+                        {result.suspicionPercent >= 40 && result.suspicionPercent < 70 && "Risque modéré"}
+                        {result.suspicionPercent < 40 && "Risque faible"}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-500">Raisons</label>
+                      <ul className="list-disc ml-5 text-sm text-gray-700">
+                        {(result.reason || []).map((r, i) => <li key={i}>{r}</li>)}
+                      </ul>
                     </div>
                   </div>
                 </div>
 
                 {/* Scan Information */}
                 <div>
-                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                    Informations du scan
-                  </h4>
+                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Informations du scan</h4>
                   <div className="space-y-3">
                     <div className="flex items-center">
                       <FiClock className="w-4 h-4 text-gray-400 mr-2" />
                       <div>
                         <label className="block text-xs font-medium text-gray-500">Date du scan</label>
-                        <p className="text-sm text-gray-900">
-                          {new Date(result.scanDate || Date.now()).toLocaleString('fr-FR')}
-                        </p>
+                        <p className="text-sm text-gray-900">{new Date(result.scanDate || Date.now()).toLocaleString('fr-FR')}</p>
                       </div>
                     </div>
-                    <div className="flex items-center">
-                      <FiShield className="w-4 h-4 text-gray-400 mr-2" />
-                      <div>
-                        <label className="block text-xs font-medium text-gray-500">Source</label>
-                        <p className="text-sm text-gray-900">API CheckPhish</p>
-                      </div>
-                    </div>
-                    {result.details && (
+                    {result.googleSafeBrowsing && (
                       <div className="flex items-start">
-                        <FiInfo className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
+                        <FiShield className="w-4 h-4 text-gray-400 mr-2 mt-0.5" />
                         <div>
-                          <label className="block text-xs font-medium text-gray-500">Détails</label>
-                          <p className="text-sm text-gray-900">{result.details}</p>
+                          <label className="block text-xs font-medium text-gray-500">Google Safe Browsing</label>
+                          <p className="text-sm text-gray-900">{result.googleSafeBrowsing.isUnsafe ? 'Menace détectée' : 'Aucune menace détectée'}</p>
+                          {result.googleSafeBrowsing.threats && result.googleSafeBrowsing.threats.length > 0 && (
+                            <ul className="list-disc ml-5 text-xs text-red-700">
+                              {result.googleSafeBrowsing.threats.map((t, i) => <li key={i}>{t.threatType} ({t.platformType})</li>)}
+                            </ul>
+                          )}
                         </div>
                       </div>
                     )}
@@ -266,15 +253,11 @@ const UrlScanner = () => {
 
               {/* Recommendations */}
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                  Recommandations
-                </h4>
+                <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Recommandations</h4>
                 <div className="bg-gray-50 rounded-lg p-4">
                   {result.isPhishing ? (
                     <div className="space-y-2">
-                      <p className="text-sm text-gray-700">
-                        <strong>⚠️ Attention :</strong> Cette URL a été identifiée comme malveillante.
-                      </p>
+                      <p className="text-sm text-gray-700"><strong>⚠️ Attention :</strong> Cette URL a été identifiée comme malveillante.</p>
                       <ul className="text-sm text-gray-600 space-y-1 ml-4">
                         <li>• Ne saisissez pas vos informations personnelles</li>
                         <li>• Ne téléchargez aucun fichier depuis ce lien</li>
@@ -283,10 +266,8 @@ const UrlScanner = () => {
                       </ul>
                     </div>
                   ) : (
-            <div className="space-y-2">
-                      <p className="text-sm text-gray-700">
-                        <strong>✅ Sécurisé :</strong> Cette URL semble sûre.
-                      </p>
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-700"><strong>✅ Sécurisé :</strong> Cette URL semble sûre.</p>
                       <ul className="text-sm text-gray-600 space-y-1 ml-4">
                         <li>• L'URL ne présente pas de signes de phishing</li>
                         <li>• Vous pouvez procéder avec prudence</li>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { motion } from 'framer-motion';
+import logo from "/assets/logo.png";
 
 const AdminRegister = () => {
   const [name, setName] = useState(''); 
