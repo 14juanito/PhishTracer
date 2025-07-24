@@ -36,3 +36,6 @@ mongodb-macos-x86_64-*/
 # Firebase
 firebase-debug.log
 .firebase/
+
+dist/
+cookies.txt
